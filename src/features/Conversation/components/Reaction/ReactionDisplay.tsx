@@ -1,9 +1,9 @@
 'use client';
 
 import type { EmojiReaction } from '@lobechat/types';
+import { Flexbox } from '@lobehub/ui';
 import { createStyles } from 'antd-style';
 import { memo } from 'react';
-import { Flexbox } from 'react-layout-kit';
 
 const useStyles = createStyles(({ css, token }) => ({
   active: css`
@@ -56,26 +56,24 @@ interface ReactionDisplayProps {
   /**
    * The reactions to display
    */
-  reactions: Record<string, EmojiReaction>;
+  reactions: EmojiReaction[];
 }
 
 const ReactionDisplay = memo<ReactionDisplayProps>(({ reactions, onReactionClick, isActive }) => {
   const { styles, cx } = useStyles();
 
-  const reactionEntries = Object.entries(reactions);
-
-  if (reactionEntries.length === 0) return null;
+  if (reactions.length === 0) return null;
 
   return (
     <Flexbox className={styles.container} horizontal>
-      {reactionEntries.map(([emoji, data]) => (
+      {reactions.map((reaction) => (
         <div
-          className={cx(styles.reactionTag, isActive?.(emoji) && styles.active)}
-          key={emoji}
-          onClick={() => onReactionClick?.(emoji)}
+          className={cx(styles.reactionTag, isActive?.(reaction.emoji) && styles.active)}
+          key={reaction.emoji}
+          onClick={() => onReactionClick?.(reaction.emoji)}
         >
-          <span>{emoji}</span>
-          {data.count > 1 && <span className={styles.count}>{data.count}</span>}
+          <span>{reaction.emoji}</span>
+          {reaction.count > 1 && <span className={styles.count}>{reaction.count}</span>}
         </div>
       ))}
     </Flexbox>

@@ -1,12 +1,11 @@
 'use client';
 
-import { ActionIcon, Tooltip } from '@lobehub/ui';
+import { ActionIcon, Flexbox, Tooltip } from '@lobehub/ui';
 import { Popover } from 'antd';
 import { createStyles } from 'antd-style';
 import { SmilePlus } from 'lucide-react';
 import { type FC, type ReactNode, memo, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Flexbox } from 'react-layout-kit';
 
 const QUICK_REACTIONS = ['👍', '👎', '❤️', '😄', '🎉', '😢', '🤔', '🚀'];
 

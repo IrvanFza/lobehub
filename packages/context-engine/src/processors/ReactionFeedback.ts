@@ -38,7 +38,7 @@ export class ReactionFeedbackProcessor extends BaseProcessor {
 
       // Only process assistant messages with reactions
       if (message.role === 'assistant' && message.metadata?.reactions) {
-        const reactions = message.metadata.reactions as Record<string, EmojiReaction>;
+        const reactions = message.metadata.reactions as EmojiReaction[];
         const feedbackText = this.convertReactionsToFeedback(reactions);
 
         if (feedbackText) {
@@ -64,13 +64,13 @@ export class ReactionFeedbackProcessor extends BaseProcessor {
   }
 
   /**
-   * Convert reactions object to human-readable feedback text
+   * Convert reactions array to human-readable feedback text
    */
-  private convertReactionsToFeedback(reactions: Record<string, EmojiReaction>): string {
+  private convertReactionsToFeedback(reactions: EmojiReaction[]): string {
     const feedbackParts: string[] = [];
 
-    for (const [emoji] of Object.entries(reactions)) {
-      const sentiment = this.getEmojiSentiment(emoji);
+    for (const reaction of reactions) {
+      const sentiment = this.getEmojiSentiment(reaction.emoji);
       if (sentiment) {
         feedbackParts.push(sentiment);
       }

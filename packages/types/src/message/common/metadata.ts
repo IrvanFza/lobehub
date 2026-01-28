@@ -80,11 +80,13 @@ export const ModelPerformanceSchema = z.object({
 // ============ Emoji Reaction ============ //
 
 export interface EmojiReaction {
+  emoji: string;
   count: number;
   users: string[];
 }
 
 export const EmojiReactionSchema = z.object({
+  emoji: z.string(),
   count: z.number(),
   users: z.array(z.string()),
 });
@@ -95,7 +97,7 @@ export const MessageMetadataSchema = ModelUsageSchema.merge(ModelPerformanceSche
   isMultimodal: z.boolean().optional(),
   isSupervisor: z.boolean().optional(),
   pageSelections: z.array(PageSelectionSchema).optional(),
-  reactions: z.record(z.string(), EmojiReactionSchema).optional(),
+  reactions: z.array(EmojiReactionSchema).optional(),
 });
 
 export interface ModelUsage extends ModelTokensUsage {
@@ -170,7 +172,6 @@ export interface MessageMetadata extends ModelUsage, ModelPerformance {
   pageSelections?: PageSelection[];
   /**
    * Emoji reactions on this message
-   * Key is the emoji character (e.g., "👍", "❤️")
    */
-  reactions?: Record<string, EmojiReaction>;
+  reactions?: EmojiReaction[];
 }

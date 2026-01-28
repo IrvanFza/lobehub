@@ -186,16 +186,20 @@ export const messageCRUDSlice: StateCreator<
     const { updateMessageMetadata } = get();
     const message = dataSelectors.getDisplayMessageById(messageId)(get());
 
-    const currentReactions = message?.metadata?.reactions || {};
-    const emojiReaction: EmojiReaction = currentReactions[emoji] || { count: 0, users: [] };
+    const currentReactions = message?.metadata?.reactions || [];
+    const existingIndex = currentReactions.findIndex((r: EmojiReaction) => r.emoji === emoji);
 
-    const newReactions: Record<string, EmojiReaction> = {
-      ...currentReactions,
-      [emoji]: {
-        count: emojiReaction.count + 1,
-        users: [...emojiReaction.users, 'user'],
-      },
-    };
+    let newReactions: EmojiReaction[];
+
+    if (existingIndex >= 0) {
+      // Update existing reaction
+      newReactions = currentReactions.map((r: EmojiReaction, i: number) =>
+        i === existingIndex ? { ...r, count: r.count + 1, users: [...r.users, 'user'] } : r,
+      );
+    } else {
+      // Add new reaction
+      newReactions = [...currentReactions, { count: 1, emoji, users: ['user'] }];
+    }
 
     await updateMessageMetadata(messageId, { reactions: newReactions });
   },
@@ -404,20 +408,22 @@ export const messageCRUDSlice: StateCreator<
     const { updateMessageMetadata } = get();
     const message = dataSelectors.getDisplayMessageById(messageId)(get());
 
-    const currentReactions = message?.metadata?.reactions || {};
-    const emojiReaction = currentReactions[emoji];
+    const currentReactions = message?.metadata?.reactions || [];
+    const existingIndex = currentReactions.findIndex((r: EmojiReaction) => r.emoji === emoji);
 
-    if (!emojiReaction) return;
+    if (existingIndex < 0) return;
 
-    const newReactions: Record<string, EmojiReaction> = { ...currentReactions };
+    const emojiReaction = currentReactions[existingIndex];
+    let newReactions: EmojiReaction[];
 
     if (emojiReaction.count <= 1) {
-      delete newReactions[emoji];
+      // Remove the reaction entirely
+      newReactions = currentReactions.filter((_: EmojiReaction, i: number) => i !== existingIndex);
     } else {
-      newReactions[emoji] = {
-        count: emojiReaction.count - 1,
-        users: emojiReaction.users.slice(0, -1),
-      };
+      // Decrease count
+      newReactions = currentReactions.map((r: EmojiReaction, i: number) =>
+        i === existingIndex ? { ...r, count: r.count - 1, users: r.users.slice(0, -1) } : r,
+      );
     }
 
     await updateMessageMetadata(messageId, { reactions: newReactions });
