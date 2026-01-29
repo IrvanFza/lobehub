@@ -163,6 +163,7 @@ const provider: GenericProviderDefinition<{
       providerId: 'feishu',
       responseMode: 'query',
       scopes: [],
+      tokenUrl: FEISHU_TOKEN_URL,
     };
   },
 
